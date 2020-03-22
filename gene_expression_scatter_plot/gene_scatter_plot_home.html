@@ -11,9 +11,33 @@
 <script src="js/nv.d3.js"></script>
 <script src="js/main.js"></script> 
 <script src="js/tToP.js"></script> 
+<style type="text/css">
+	#PointNotes{
+		display: none;
+		float: left;
+		margin-top: 5px;
+		margin-left: 300px;
+		font-size: 12px;
+	}	
+</style>
 </head>
 <body class="with-3d-shadow with-transitions">
 <div id="id_main_output_scatter" class="chartWrap" style="background-color: white">
+    <!--Point Notes-->
+	<div id="PointNotes">
+		Point operation:&nbsp;&nbsp;&nbsp;
+			Single Click: show or hide points for the tissue&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			Double click: show only points in the tissue
+	</div>
+	<a id="NoteButton"><img src="src/note.png" style="width: 15px;height: 15px; margin-top: 5px;margin-left: 25px; float: right;"></a>
+	<script>
+		(function(){
+			var btn=document.getElementById('NoteButton');
+			var box=document.getElementById('PointNotes');
+			btn.onmouseover=function(){box.style.display='block';}
+			btn.onmouseout=function(){box.style.display='none';}
+		})();
+	</script>
     <svg></svg>
 </div>
 <div id="id_main_output_tooltips">
