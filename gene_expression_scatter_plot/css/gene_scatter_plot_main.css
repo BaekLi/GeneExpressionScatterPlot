@@ -62,9 +62,10 @@ h3 {
 
 .center-blue-higher-div {
     width: 500px;
-    height: 200px;
+    height:auto;
     margin-left: auto;
     margin-right: auto;
+    padding: 10px 20px 10px 20px;
     border:1px solid #06989D;
     overflow: auto; 
     color: #1811EE 
