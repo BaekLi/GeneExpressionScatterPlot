@@ -7,6 +7,7 @@ var groups = new Array();
 var attrMatchs = new Array();
 var tissueMatchs = new Array();
 var detailMatchs = new Array();
+var dic = new Array();  //定义一个字典
 var lastLineCorrelationCoefficient = "";
 var numForChangingTheOrderByTissue = 0;
 var numForChangingTheOrderByCoefficient = 0;
@@ -33,7 +34,7 @@ function clickTheSubmit() {
     $("#id_main_settings_settings").hide();
     $("#id_main_settings").hide();
     window.scrollTo(document.body.scrollHeight, 0);
-    makeStringIntoJson();
+    getJsons();
     drawScatterPlot();
 }
 function makeFileToString() {
@@ -69,10 +70,36 @@ function makeFileToString() {
         errorCode(100);
     }
 }
-function makeStringIntoJson() {
-    var strGene1 = document.getElementById("id_main_input_preview_gene1").innerHTML;
+// 从前端页面获得json文件字符串
+function getJsons(){
+	var strGene1 = document.getElementById("id_main_input_preview_gene1").innerHTML;
     var strGene2 = document.getElementById("id_main_input_preview_gene2").innerHTML;
     var strInformation = document.getElementById("id_main_input_preview_information").innerHTML;
+	div = condition_specific_correlation(strGene1, strGene2, strInformation);
+	console.log(div);
+}
+// 定义一个字典
+function condition_specific_correlation(g1, g2, info){
+	var a = makeStringIntoJson(g1, g2, info);
+	if(a.length==4){
+		var numberOfExecuted = makeJsonIntoArray(a[0], a[1], a[2], a[3]);
+		lastLineCorrelationCoefficient = getCorrelationCoefficientAndSetGroups();
+		if (numberOfExecuted != 0) {
+			// 以第二排的相关系数进行排序
+			sortByColumn(2);
+		}
+	}
+	
+	var d = new Array();
+	for(var i = 0; i < groups.length - 1; i++){
+		var value = new Array();
+		value["r"] = groups[i][1].toFixed(5) + groups[i][4];
+		value["n"] = groups[i][2];			value["p-value"] = makeNumberToStringAndExponential(groups[i][3]);
+		d[groups[i][0]] = new Array(value);
+	}
+	return d;
+}
+function makeStringIntoJson(strGene1, strGene2, strInformation) {
     if(strGene1 != "" && strGene2 != "") {
         var isJsonGene1 = isJson(strGene1);
         var isJsonGene2 = isJson(strGene2);
@@ -93,7 +120,7 @@ function makeStringIntoJson() {
                 errorCode(108);
             }
             else {
-                makeJsonIntoArray(jsonGene1, jsonGene2, jsonInformation, isJsonInformation);
+                return new Array(jsonGene1, jsonGene2, jsonInformation, isJsonInformation);
             }
         }
         else {
@@ -200,10 +227,7 @@ function makeJsonIntoArray(jsonGene1, jsonGene2, jsonInformation, isJsonInformat
         numberOfInformation++;
     }
     setAndDisplayUtilization(numberOfExecuted, numberOfExecutedInfor, numberOfGene1, numberOfGene2, numberOfInformation, isJsonInformation);
-    lastLineCorrelationCoefficient = getCorrelationCoefficientAndSetGroups();
-    if (numberOfExecuted != 0) {
-        sortByColumn(2);
-    }
+    return numberOfExecuted;
 }
 function setAndDisplayUtilization (numberOfExecuted, numberOfExecutedInfor, numberOfGene1, numberOfGene2, numberOfInformation, isJsonInformation) {
     document.getElementById("id_main_output_utilization").innerHTML =
