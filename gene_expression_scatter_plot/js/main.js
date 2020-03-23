@@ -1,20 +1,21 @@
-var tissues = [];
-var datas = new Array();
+var tissues = [];	// 所有有效点的tissue分类
+var datas = new Array(); // 存储每个tissue下的坐标
 datas[0] = new Array();
-var details = new Array();
+var details = new Array();	//存储每个tissue的detail
 details[0] = new Array();
-var groups = new Array();
-var attrMatchs = new Array();
-var tissueMatchs = new Array();
-var detailMatchs = new Array();
-var dic = new Array();  //定义一个字典
-var lastLineCorrelationCoefficient = "";
+var groups = new Array();	//存储每个datas的tissue，相关系数，个数，pvalue信息
+var attrMatchs = new Array(); 	//用来匹配各JSON的键名
+var tissueMatchs = new Array();	//用来匹配INFO.JSON里的键名，有tissue和category两种
+var detailMatchs = new Array();	//用来匹配INFO.JSON里的键名detail
+var dic = new Array();	//定义一个字典
+var lastLineCorrelationCoefficient = "";	//数据表格最后一行统计计算所有数据
 var numForChangingTheOrderByTissue = 0;
 var numForChangingTheOrderByCoefficient = 0;
 var numForChangingTheOrderByNumber = 0;
 var numForChangingTheOrderByP = 0;
 var executeAdjustOfBasicModel = "";
 var strTissueSettings = "Tissue";
+// 页面启动时就运行
 function startRun() {
     makeFileToString();
     displaySettingsPreviewOfBasicModel();
@@ -26,6 +27,7 @@ function startRun() {
     $("#id_main_output").hide();
     $("#id_main_settings").hide();
 }
+// 点击Submit时运行
 function clickTheSubmit() {
     $("#id_main_output_scatter").show();
     $("#id_main_output_tooltips").show();
@@ -33,10 +35,11 @@ function clickTheSubmit() {
     $("#id_main_output").show();
     $("#id_main_settings_settings").hide();
     $("#id_main_settings").hide();
-    window.scrollTo(document.body.scrollHeight, 0);
-    getJsons();
+   window.scrollTo(document.body.scrollHeight, 0);
+	getJsons();
     drawScatterPlot();
 }
+// 将文件内容变成字符串并显示在页面
 function makeFileToString() {
     var reader;
     if (FileReader) {
@@ -78,7 +81,7 @@ function getJsons(){
 	div = condition_specific_correlation(strGene1, strGene2, strInformation);
 	console.log(div);
 }
-// 定义一个字典
+//定义一个字典
 function condition_specific_correlation(g1, g2, info){
 	var a = makeStringIntoJson(g1, g2, info);
 	if(a.length==4){
@@ -99,6 +102,7 @@ function condition_specific_correlation(g1, g2, info){
 	}
 	return d;
 }
+// 将显示在前端的字符串转换成json格式，如出错则判断错误原因
 function makeStringIntoJson(strGene1, strGene2, strInformation) {
     if(strGene1 != "" && strGene2 != "") {
         var isJsonGene1 = isJson(strGene1);
@@ -120,7 +124,7 @@ function makeStringIntoJson(strGene1, strGene2, strInformation) {
                 errorCode(108);
             }
             else {
-                return new Array(jsonGene1, jsonGene2, jsonInformation, isJsonInformation);
+				return new Array(jsonGene1, jsonGene2, jsonInformation, isJsonInformation);
             }
         }
         else {
@@ -147,6 +151,7 @@ function makeStringIntoJson(strGene1, strGene2, strInformation) {
         }
     }
 }
+// 将json格式的字符串分别赋值给tissues, datas, details
 function makeJsonIntoArray(jsonGene1, jsonGene2, jsonInformation, isJsonInformation) {
     var numberOfExecuted = 0;
     var numberOfExecutedInfor = 0;
@@ -159,6 +164,7 @@ function makeJsonIntoArray(jsonGene1, jsonGene2, jsonInformation, isJsonInformat
         var attrTissue = "";
         var attrDetail = "";
         for (var i = 0; i < attrMatchs.length; i++) {
+			// 用""替换attrGene1里出现attrMatchs[i][0]的子字符串，返回的新字符串赋值给attrTemp，replace方法不改变attrGene1的值
             var attrTemp = attrGene1.replace(attrMatchs[i][0], "");
             attTemp = attrTemp.replace(attrMatchs[i][1], "");
             var gene2Temp = attrMatchs[i][2] + attTemp + attrMatchs[i][3];
@@ -226,9 +232,11 @@ function makeJsonIntoArray(jsonGene1, jsonGene2, jsonInformation, isJsonInformat
     for(var attrInformation in jsonInformation) {
         numberOfInformation++;
     }
-    setAndDisplayUtilization(numberOfExecuted, numberOfExecutedInfor, numberOfGene1, numberOfGene2, numberOfInformation, isJsonInformation);
-    return numberOfExecuted;
+   
+	setAndDisplayUtilization(numberOfExecuted, numberOfExecutedInfor, numberOfGene1, numberOfGene2, numberOfInformation, isJsonInformation);
+	return numberOfExecuted;
 }
+// 计算并显示Utilization
 function setAndDisplayUtilization (numberOfExecuted, numberOfExecutedInfor, numberOfGene1, numberOfGene2, numberOfInformation, isJsonInformation) {
     document.getElementById("id_main_output_utilization").innerHTML =
         "Gene1 utilization: " +
@@ -245,6 +253,7 @@ function setAndDisplayUtilization (numberOfExecuted, numberOfExecutedInfor, numb
             numberOfExecutedInfor + "/" + numberOfInformation;
     }
 }
+// 根据column进行排序
 function sortByColumn(numForChangingTheOrderByColumn) {
     var str = "";
     for (var i = 0; i < groups.length - 1; i++) {
@@ -322,10 +331,12 @@ function sortByColumn(numForChangingTheOrderByColumn) {
         numForChangingTheOrderByP++;
         break;
     }
+	// 点击相应的column就可以进行该column的排序
     str = "<tr><th><p onclick='sortByColumn(1);'>" + strTissueSettings + "</p></th><th><p onclick='sortByColumn(2);'>Correlation Coefficient</p></th><th><p onclick='sortByColumn(3);'>Number</p></th><th style='width: 200px;'><p onclick='sortByColumn(4);'>P Value (one-tail)</p></th></tr>" +
         str + lastLineCorrelationCoefficient;
     document.getElementById("id_main_output_table").innerHTML = str;
 }
+// 画散点图
 function drawScatterPlot() {
     var tissues = getTissues();
     var datas = getDatas();
@@ -489,6 +500,7 @@ function clickTheAddOfBasicModel() {
     addTheMatchToArray();
     showMatchs();
 }
+//为attrMatchs,tissueMatchs,detailMatchs数组赋上要匹配的值
 function addTheDefaultMatchToArray() {
     var len = attrMatchs.length;
     attrMatchs[len] = new Array();
@@ -605,6 +617,7 @@ function isExistInDetailMatchs(detail) {
     }
     return false;
 }
+// 计算相关系数并为groups赋值
 function getCorrelationCoefficientAndSetGroups () {
     var tail = 1;
     var str = "";
@@ -687,7 +700,7 @@ function getDatas() {
 function getDetatils() {
     return this.details;
 }
-
+// 错误代码的代号与原因
 function errorCode(temp) {
     var code = {
                 '100': 'your browser does not support FileReader objects',
@@ -702,6 +715,7 @@ function errorCode(temp) {
                }
     alert("Error " + temp + ": " + code[temp]);
 }
+// 判断是不是JSON
 function isJson(str) {
     if (typeof str == 'string') {
         try {
@@ -718,6 +732,7 @@ function isJson(str) {
     }
     console.log('It is not a string!')
 }
+// 查找关键词tissue在tissues数组里的位置
 function indexOfTissues(tissue, tissues) {
     for (var i = 0; i < tissues.length; i++) {
         if (tissue == tissues[i]) {
@@ -751,6 +766,7 @@ function formatZero(temp){
         return temp;
     }
 }
+// pvalue的计算
 function correlationCoefficientToPValue(r, n, tail) {
     var degreesOfFreedom = n;
     var t = r * Math.pow((degreesOfFreedom - 2) / (1 - r * r), 0.5);
