@@ -19,6 +19,15 @@
 		margin-left: 300px;
 		font-size: 12px;
 	}	
+	#TableNotes{
+		width: 200px;
+		display: none;
+		float: left;
+		margin-top: 30px;
+		margin-left: 270px;
+		font-size: 12px;
+		text-align: center
+	}
 </style>
 </head>
 <body class="with-3d-shadow with-transitions">
@@ -39,6 +48,18 @@
 		})();
 	</script>
     <svg></svg>
+	<div id="TableNotes">
+		Click the corresponding column in the header to display the data in the table in ascending or reverse order according to this column.
+	</div>
+	<a id="TableButton"><img src="src/note.png" style="width: 15px;height: 15px; margin-top: -10px;margin-right: 650px; float: right;"></a>
+	<script>
+		(function(){
+			var btn=document.getElementById('TableButton');
+			var box=document.getElementById('TableNotes');
+			btn.onmouseover=function(){box.style.display='block';}
+			btn.onmouseout=function(){box.style.display='none';}
+		})();
+	</script>
 </div>
 <div id="id_main_output_tooltips">
 	<p align="center">
