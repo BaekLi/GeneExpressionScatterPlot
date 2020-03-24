@@ -1,10 +1,12 @@
 // JavaScript Document
 // 计算 Empirical P-Value
-function empirical_p(gene1,gene2,datas,groups,total){
+function empirical_p(gene1,gene2,datas,groups,totals){
 	var count = new Array(groups.length+1).fill(0);
-	var totals = new Array();
-	// 重复1000次
-	for(var m=0;m<1000;m++){
+	var total = new Array();
+	console.log(totals);
+	// 随机重复1000-10000次
+	var xun = 1000+ Math.floor(Math.random()*9001);
+	for(var m = 0;m<xun ;m++){
 		//计算随机排列后的data与group
 		var data = new Array();
 		var group = new Array();
@@ -21,24 +23,27 @@ function empirical_p(gene1,gene2,datas,groups,total){
 				num++;
 			}
 		}
-		//获得pvalue等值
-		getCorrelationCoefficientAndSetGroups (data,group,totals);
-		for(var i=0;i<groups.length;i++){
-			if(makeNumberToStringAndExponential(groups[i][3])<makeNumberToStringAndExponential(group[i][3])){
-				count[i]++;
+		//获得相关系数等值
+		getCorrelationCoefficientAndSetGroups (data,group,total);
+		for(var k=0;k<count.length-1;k++){
+			// 比较的相关系数是绝对值
+			if(group[k][1]>groups[k][1]){
+				count[k]++;
 			}
+			//比较的是非绝对值的相关系数 k<count.length
+//			if(total[k]>totals[k]){
+//				count[k]++;
+//			}
 		}
-		//将pvalue的值转换成字符串进行比较
-		if(makeNumberToStringAndExponential(total[0])<makeNumberToStringAndExponential(totals[m])){
+		if(total[m]>totals[0]){
 			count[groups.length]++;
 		}
 	}
 	for(var i=0;i<groups.length;i++){
-		count[i]=count[i]/1000.0;
-		console.log(count[i]);
+		count[i]=count[i]/xun;
 		groups[i].push(count[i]);
 	}
-	total.push(count[groups.length]/1000.0);
+	totals.push(count[groups.length]/xun);
 }
 // 随机排列数组内的数据
 function randomJson(arr){
